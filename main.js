@@ -1,6 +1,10 @@
 import { firefox } from "playwright";
+import path from "path";
+import fs from "fs/promises";
 
 import { StopWatch } from "./StopWatch.js";
+
+import slugify from "slugify";
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -56,6 +60,20 @@ async function scanListingPage(page, listing) {
   return result;
 }
 
+function dateSlug({ date = null, utc = false } = {}) {
+  if (!date) {
+    date = new Date();
+  }
+
+  if (!utc) {
+    const offset = date.getTimezoneOffset();
+    date = new Date(date.getTime() - offset * 60 * 1000);
+  }
+
+  const [yyyy, mm, dd, hh, MM, ss, _] = date.toISOString().split(/[\-T\:\.]/);
+  return `${yyyy}-${mm}-${dd}-${hh}-${MM}-${ss}`;
+}
+
 async function main() {
   const stopWatch = new StopWatch();
 
@@ -100,8 +118,18 @@ async function main() {
 
   await browser.close();
 
-  // TODO: write output data to file
+  // TODO: move to cli option
+  // write data to file
+  const searchSlug = slugify(searchString);
+  const outputDir = path.join("results", searchSlug);
+  await fs.mkdir(outputDir, { recursive: true });
 
+  const outputFile = path.join(outputDir, `${dateSlug()}.json`);
+
+  await fs.writeFile(outputFile, JSON.stringify(listings, null, 2));
+  console.log(`Wrote results to ${outputFile}`);
+
+  console.log();
   console.log(`Finished in ${stopWatch.getElapsed()}s`);
 
   process.exit();
