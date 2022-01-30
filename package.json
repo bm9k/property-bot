@@ -11,5 +11,9 @@
   },
   "keywords": [],
   "author": "Ben Martin",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "playwright": "^1.18.1"
+  },
+  "type": "module"
 }
