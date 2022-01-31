@@ -20,7 +20,7 @@
 ## Usage
 TODO:
 ```
-property-bot "42 Wallaby Way, Sydney 2000"
+property-bot "42 Wallaby Way, Sydney 2000" -o results/
 ```
 
 ## Contributing

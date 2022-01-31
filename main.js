@@ -3,6 +3,8 @@ import fs from "fs/promises";
 
 import { firefox } from "playwright";
 import slugify from "slugify";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 
 import { StopWatch } from "./StopWatch.js";
 
@@ -74,7 +76,11 @@ function dateSlug({ date = null, utc = false } = {}) {
   return `${yyyy}-${mm}-${dd}-${hh}-${MM}-${ss}`;
 }
 
-async function getListings({searchUrl, searchString}) {
+async function getListings({
+  searchUrl,
+  searchString,
+  showUnitsFirst: unitSummary = true,
+} = {}) {
   const browser = await firefox.launch({
     headless: true,
   });
@@ -88,14 +94,15 @@ async function getListings({searchUrl, searchString}) {
 
   const listings = await scanListingsPage(page, searchUrl, searchString);
 
-  // TODO: move to cli option
   // show units
-  const units = listings.map(({ address, url }) => {
-    const unit = address.split("/")[0].trim();
-    return unit;
-  });
+  if (unitSummary) {
+    const units = listings.map(({ address, url }) => {
+      const unit = address.split("/")[0].trim();
+      return unit;
+    });
 
-  console.log(units);
+    console.log(units);
+  }
 
   // get & show listing availability
   for (let listing of listings) {
@@ -125,25 +132,56 @@ async function dumpResults({ listings, searchString, outputRootDir }) {
   return outputFile;
 }
 
+function initialiseCLI() {
+  const yarg = yargs(hideBin(process.argv));
+
+  return yarg
+    .scriptName("property-bot")
+    .positional("search-string", {
+      type: "string",
+      describe:
+        'the string to use for the property search, e.g. "42 wallaby way, sydney 2000"',
+    })
+    .option("o", {
+      alias: "output-dir",
+      describe:
+        "the directory in which to store the search results, e.g. results/",
+      type: "string",
+    })
+    .option("u", {
+      alias: "search-url",
+      default: "https://www.realestate.com.au/rent/",
+      describe: "the url of the search page",
+      type: "string",
+    })
+    .option("show-units", {
+      boolean: true,
+      default: true,
+      describe: "show the unit numbers before showing the full results, useful when searching in one apartment building"
+    })
+    .help().argv;
+}
+
 async function main() {
   const stopWatch = new StopWatch();
 
-  // TODO: move to cli arg (default)
-  const searchUrl = "https://www.realestate.com.au/rent/";
-  // TODO: add cli option lib
-  const searchString = process.argv[2];
+  const options = initialiseCLI();
 
-  const listings = await getListings({ searchUrl, searchString });
-
-  // TODO: move to cli option
-  // write data to file
-  const outputFile = await dumpResults({
-    listings,
-    searchString,
-    outputRootDir: "results",
+  const listings = await getListings({
+    searchUrl: options.searchUrl,
+    searchString: options._[0],
+    showUnitsFirst: options.showUnits,
   });
 
-  console.log(`Wrote results to ${outputFile}`);
+  if (options.outputDir) {
+    const outputFile = await dumpResults({
+      listings,
+      searchString,
+      outputRootDir: options.outputDir,
+    });
+
+    console.log(`Wrote results to ${outputFile}`);
+  }
 
   console.log();
   console.log(`Finished in ${stopWatch.getElapsed()}s`);
