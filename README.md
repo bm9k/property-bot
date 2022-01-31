@@ -15,7 +15,8 @@
 [![License](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/licenses/MIT) -->
 
 ## Demo
-![Demo of Property Bot](img/demo.gif)
+<!-- ![Demo of Property Bot](img/demo.gif) -->
+TODO: show gif of cli app
 
 ## Usage
 TODO:
