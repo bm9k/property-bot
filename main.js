@@ -1,10 +1,10 @@
-import { firefox } from "playwright";
 import path from "path";
 import fs from "fs/promises";
 
-import { StopWatch } from "./StopWatch.js";
-
+import { firefox } from "playwright";
 import slugify from "slugify";
+
+import { StopWatch } from "./StopWatch.js";
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -74,9 +74,7 @@ function dateSlug({ date = null, utc = false } = {}) {
   return `${yyyy}-${mm}-${dd}-${hh}-${MM}-${ss}`;
 }
 
-async function main() {
-  const stopWatch = new StopWatch();
-
+async function getListings({searchUrl, searchString}) {
   const browser = await firefox.launch({
     headless: true,
   });
@@ -87,11 +85,6 @@ async function main() {
   });
 
   const page = await context.newPage();
-
-  // TODO: move to cli arg (default)
-  const searchUrl = "https://www.realestate.com.au/rent/";
-  // TODO: add cli option lib
-  const searchString = process.argv[2];
 
   const listings = await scanListingsPage(page, searchUrl, searchString);
 
@@ -118,15 +111,38 @@ async function main() {
 
   await browser.close();
 
-  // TODO: move to cli option
-  // write data to file
-  const searchSlug = slugify(searchString);
-  const outputDir = path.join("results", searchSlug);
-  await fs.mkdir(outputDir, { recursive: true });
+  return listings;
+}
 
+async function dumpResults({ listings, searchString, outputRootDir }) {
+  const searchSlug = slugify(searchString);
+  const outputDir = path.join(outputRootDir, searchSlug);
   const outputFile = path.join(outputDir, `${dateSlug()}.json`);
 
+  await fs.mkdir(outputDir, { recursive: true });
   await fs.writeFile(outputFile, JSON.stringify(listings, null, 2));
+
+  return outputFile;
+}
+
+async function main() {
+  const stopWatch = new StopWatch();
+
+  // TODO: move to cli arg (default)
+  const searchUrl = "https://www.realestate.com.au/rent/";
+  // TODO: add cli option lib
+  const searchString = process.argv[2];
+
+  const listings = await getListings({ searchUrl, searchString });
+
+  // TODO: move to cli option
+  // write data to file
+  const outputFile = await dumpResults({
+    listings,
+    searchString,
+    outputRootDir: "results",
+  });
+
   console.log(`Wrote results to ${outputFile}`);
 
   console.log();
