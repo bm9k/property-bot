@@ -41,6 +41,8 @@ async function scanListingsPage(page, searchUrl, searchString) {
 }
 
 async function scanListingPage(page, listing) {
+  await page.goto("about:blank");
+
   page
     .goto(listing.url, {
       timeout: 0,
