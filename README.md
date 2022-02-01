@@ -15,8 +15,8 @@
 [![License](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/licenses/MIT) -->
 
 ## Demo
-<!-- ![Demo of Property Bot](img/demo.gif) -->
-TODO: show gif of cli app
+![Demo of Property Bot](demo/42-wallaby-way.gif)
+If the demo moves too quickly, checkout the [screenshot of the sample output](demo/42-wallaby-way.png)
 
 ## Installation
 ```
