@@ -108,10 +108,7 @@ async function getListings({
   for (let listing of listings) {
     const extra = await scanListingPage(page, listing);
 
-    listing = {
-      ...listing,
-      ...extra,
-    };
+    Object.assign(listing, extra);
 
     console.log(listing);
   }
