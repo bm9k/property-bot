@@ -18,11 +18,18 @@
 <!-- ![Demo of Property Bot](img/demo.gif) -->
 TODO: show gif of cli app
 
+## Installation
+```
+git clone https://github.com/bm9k/property-bot/
+cd property-bot
+npm install -g
+```
+
 ## Usage
-TODO:
 ```
-property-bot "42 Wallaby Way, Sydney 2000" -o results/
+propertybot "42 Wallaby Way, Sydney 2000" -o results/
 ```
+Note: the output directory will be relative to the current working directory, not the repository root
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

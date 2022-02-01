@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "property-bot": "./main.js"
+    "propertybot": "./main.js"
   },
   "keywords": [],
   "author": "Ben Martin",
