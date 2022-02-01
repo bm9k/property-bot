@@ -155,7 +155,8 @@ function initialiseCLI() {
     .option("show-unit-summary", {
       boolean: true,
       default: true,
-      describe: "show a summary of the unit numbers before showing the full results, useful when searching in one apartment building"
+      describe:
+        "show a summary of the unit numbers before showing the full results, useful when searching in one apartment building",
     })
     .help().argv;
 }
@@ -166,7 +167,7 @@ async function main() {
   const options = initialiseCLI();
 
   const searchString = options._[0];
-  const {searchUrl, showUnitSummary} = options;
+  const { searchUrl, showUnitSummary } = options;
 
   const listings = await getListings({
     searchUrl,
