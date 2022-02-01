@@ -104,10 +104,13 @@ async function getListings({
       return unit;
     });
 
+    console.log("Unit summary:")
     console.log(units);
+    console.log();
   }
 
   // get & show listing availability
+  console.log("Listing info:")
   for (let listing of listings) {
     const extra = await scanListingPage(page, listing);
 
@@ -115,6 +118,7 @@ async function getListings({
 
     console.log(listing);
   }
+  console.log();
 
   await browser.close();
 
