@@ -79,7 +79,7 @@ function dateSlug({ date = null, utc = false } = {}) {
 async function getListings({
   searchUrl,
   searchString,
-  showUnitsFirst: unitSummary = true,
+  showUnitSummary = true,
 } = {}) {
   const browser = await firefox.launch({
     headless: true,
@@ -95,7 +95,7 @@ async function getListings({
   const listings = await scanListingsPage(page, searchUrl, searchString);
 
   // show units
-  if (unitSummary) {
+  if (showUnitSummary) {
     const units = listings.map(({ address, url }) => {
       const unit = address.split("/")[0].trim();
       return unit;
@@ -154,10 +154,10 @@ function initialiseCLI() {
       describe: "the url of the search page",
       type: "string",
     })
-    .option("show-units", {
+    .option("show-unit-summary", {
       boolean: true,
       default: true,
-      describe: "show the unit numbers before showing the full results, useful when searching in one apartment building"
+      describe: "show a summary of the unit numbers before showing the full results, useful when searching in one apartment building"
     })
     .help().argv;
 }
@@ -167,10 +167,13 @@ async function main() {
 
   const options = initialiseCLI();
 
+  const searchString = options._[0];
+  const {searchUrl, showUnitSummary} = options;
+
   const listings = await getListings({
-    searchUrl: options.searchUrl,
-    searchString: options._[0],
-    showUnitsFirst: options.showUnits,
+    searchUrl,
+    searchString,
+    showUnitSummary,
   });
 
   if (options.outputDir) {
